@@ -1,0 +1,79 @@
+# We assume GitHub flow is used, and we simply deploy all feature branches to production.
+# Feature flags are built into the software so we don't deal with it in our CD setup.
+# If an error occurred kubernetes rolls back automatically.
+# The feature is later merged in branch master when the feature behaves ok.
+#
+# @see https://blogs.technet.microsoft.com/devops/2016/06/21/a-git-workflow-for-continuous-delivery/
+# @see http://blog.launchdarkly.com/is-it-a-feature-flag-or-a-feature-toggle/
+pipeline:
+
+  restore_cache:
+    image: drillster/drone-volume-cache:latest
+    restore: true
+    mount:
+      # everything in this folder is inflated here and cached later:
+      - /drone
+
+  test:
+    image: node:8.5
+    commands:
+      - |
+        echo "cache = /drone/.npm" > .npmrc
+      - npm install
+      - npm test
+    when:
+      branch:
+        exclude: [ master ]
+
+  # caching this stage already in case the next phase borks
+  rebuild_cache_stage_1:
+    image: drillster/drone-volume-cache:latest
+    rebuild: true
+    mount:
+      - /drone
+
+  build:
+    image: docker
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    commands:
+      - |
+        IMG=$${REGISTRY}/api
+        echo building image $${IMG}
+        docker build --rm -t $${IMG} .
+        docker push $${IMG}
+        docker tag $${IMG} $${IMG}:${DRONE_COMMIT_SHA}
+        docker push $${IMG}:${DRONE_COMMIT_SHA}
+    secrets: [registry]
+
+  deploy:
+    image: docker
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    commands:
+      - |
+        docker run --rm --dns=$${KUBERNETES_DNS}  --dns-search='svc.cluster.local' --dns-opt=ndots:2 \
+          -e PLUGIN_KUBERNETES_SERVER=https://kubernetes.default \
+          -e PLUGIN_NAMESPACE=default \
+          -e PLUGIN_KUBERNETES_CERT=$${KUBERNETES_CERT} \
+          -e PLUGIN_KUBERNETES_TOKEN=$${KUBERNETES_TOKEN} \
+          -e PLUGIN_DEPLOYMENT=api \
+          -e PLUGIN_REPO=$${REGISTRY}/api \
+          -e PLUGIN_CONTAINER=api \
+          -e PLUGIN_TAG=${DRONE_COMMIT_SHA} \
+          quay.io/honestbee/drone-kubernetes
+    secrets: [registry, kubernetes_dns, kubernetes_cert, kubernetes_token]
+
+  rebuild_cache_stage_2:
+    image: drillster/drone-volume-cache:latest
+    rebuild: true
+    mount:
+      - /drone
+
+  slack:
+    image: plugins/slack
+    webhook: https://hooks.slack.com/services/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
+    channel: drone-build
+    username: Drone
+    when:
+      status: [ success, failure ]

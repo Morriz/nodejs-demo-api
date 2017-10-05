@@ -1,0 +1,13 @@
+{
+  "name": "nodejs-demo-api",
+  "version": "0.1.0",
+  "private": true,
+  "main": "server.js",
+  "scripts": {
+    "start": "node server",
+    "test": "echo 'TEST: OK'"
+  },
+  "dependencies": {
+    "restify": "*"
+  }
+}
