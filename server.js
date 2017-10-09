@@ -25,7 +25,7 @@ function handler(req, res) {
   try {
     // do some api call
     // and send result
-    res.send('ok')
+    res.send(`method[${method}]: ok`)
   } catch (e) {
     res.send(500, 'Internal server error')
   }
