@@ -5,6 +5,10 @@
 #
 # @see https://blogs.technet.microsoft.com/devops/2016/06/21/a-git-workflow-for-continuous-delivery/
 # @see http://blog.launchdarkly.com/is-it-a-feature-flag-or-a-feature-toggle/
+clone:
+  environment:
+    - GIT_SSL_NO_VERIFY=true
+
 pipeline:
 
   restore_cache:
@@ -77,4 +81,3 @@ pipeline:
     username: Drone
     when:
       status: [ success, failure ]
-      
