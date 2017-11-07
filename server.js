@@ -1,6 +1,15 @@
 const restify = require('restify')
 const env = process.env
 const server = restify.createServer()
+const Prometheus = require('prom-client')
+
+const metricsInterval = Prometheus.collectDefaultMetrics()
+const httpRequestDurationMicroseconds = new Prometheus.Histogram({
+  name: 'http_request_duration_ms',
+  help: 'Duration of HTTP requests in ms',
+  labelNames: ['method', 'route', 'code'],
+  buckets: [0.10, 5, 15, 50, 100, 200, 300, 400, 500]  // buckets for response time from 0.1ms to 500ms
+})
 
 const methods = {
   public: ['publicmethod'],
@@ -17,27 +26,74 @@ function handler(req, res) {
   const method = req.params.method
   const body = req.body
 
-  if (!methods.public.includes(method) && !methods.private.includes(method))
-    return res.send(404, 'Method does not exist: ' + method)
-  if (methods.private.includes(method) && (key === '' || secret === ''))
-    return res.send(401, 'Unauthorized')
-
-  try {
-    // do some api call
-    // and send result
-    res.send(`method[${method}]: ok`)
-  } catch (e) {
-    res.send(500, 'Internal server error')
+  if (!methods.public.includes(method) && !methods.private.includes(method)) {
+    res.send(404, 'Method does not exist: ' + method)
+    return next()
   }
+  if (methods.private.includes(method) && (key === '' || secret === '')) {
+    res.send(401, 'Unauthorized')
+    return next()
+  }
+
+  // do some api call
+  // and send result
+  setTimeout(() => {
+    res.send(`method[${method}]: ok`)
+    next()
+  }, Math.round(Math.random() * 200))
 }
+
+// Runs before each requests
+server.use((req, res, next) => {
+  res.locals.startEpoch = Date.now()
+  next()
+})
+
+app.get('/bad', (req, res, next) => {
+  next(new Error('My Error'))
+})
 
 server.get('/api/:method', handler)
 server.post('/api/:method', handler)
 // health check:
-server.get('/', (req, res) => res.send('ok'))
+server.get('/healthz', (req, res) => res.send('ok'))
+// metrics:
+server.get('/metrics', (req, res) => {
+  res.set('Content-Type', Prometheus.register.contentType)
+  res.end(Prometheus.register.metrics())
+})
 
+// Error handler
+app.use((err, req, res, next) => {
+  res.send(500, 'Unknown')
+  next()
+})
 
+// Runs after each requests
+app.use((req, res, next) => {
+  const responseTimeInMs = Date.now() - res.locals.startEpoch
+
+  httpRequestDurationMicroseconds
+    .labels(req.method, req.route.path, res.statusCode)
+    .observe(responseTimeInMs)
+
+  next()
+})
 
 server.listen(env.PORT || 3000, () => {
   console.log('%s listening at %s', server.name, server.url)
+})
+
+// Graceful shutdown
+process.on('SIGTERM', () => {
+  clearInterval(metricsInterval)
+
+  server.close((err) => {
+    if (err) {
+      console.error(err)
+      process.exit(1)
+    }
+
+    process.exit(0)
+  })
 })
