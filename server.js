@@ -19,7 +19,7 @@ const methods = {
 server.use(restify.plugins.bodyParser())
 server.use(restify.plugins.queryParser())
 
-function handler(req, res) {
+function handler(req, res, next) {
   const qry = req.query || {}
   const key = qry.key || ''
   const secret = qry.secret || ''
@@ -45,6 +45,7 @@ function handler(req, res) {
 
 // Runs before each requests
 server.use((req, res, next) => {
+  if (!res.locals) res.locals = {}
   res.locals.startEpoch = Date.now()
   next()
 })
@@ -56,7 +57,7 @@ server.get('/bad', (req, res, next) => {
 server.get('/api/:method', handler)
 server.post('/api/:method', handler)
 // health check:
-server.get('/healthz', (req, res) => res.send('ok'))
+server.get('/healthz', (req, res, next) => res.send('ok') && next())
 // metrics:
 server.get('/metrics', (req, res) => {
   res.set('Content-Type', Prometheus.register.contentType)
