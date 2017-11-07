@@ -8,6 +8,7 @@
     "test": "echo 'TEST: OK'"
   },
   "dependencies": {
+    "prom-client": "^10.2.2",
     "restify": "*"
   }
 }

@@ -49,7 +49,7 @@ server.use((req, res, next) => {
   next()
 })
 
-app.get('/bad', (req, res, next) => {
+server.get('/bad', (req, res, next) => {
   next(new Error('My Error'))
 })
 
@@ -64,13 +64,13 @@ server.get('/metrics', (req, res) => {
 })
 
 // Error handler
-app.use((err, req, res, next) => {
+server.use((err, req, res, next) => {
   res.send(500, 'Unknown')
   next()
 })
 
 // Runs after each requests
-app.use((req, res, next) => {
+server.use((req, res, next) => {
   const responseTimeInMs = Date.now() - res.locals.startEpoch
 
   httpRequestDurationMicroseconds
