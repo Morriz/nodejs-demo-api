@@ -57,7 +57,7 @@ pipeline:
           -e PLUGIN_NAMESPACE=default \
           -e PLUGIN_KUBERNETES_CERT=$${KUBERNETES_CERT} \
           -e PLUGIN_KUBERNETES_TOKEN=$${KUBERNETES_TOKEN} \
-          -e PLUGIN_DEPLOYMENT=mostack-api \
+          -e PLUGIN_DEPLOYMENT=team-frontend-api \
           -e PLUGIN_REPO=$${REGISTRY}/api \
           -e PLUGIN_CONTAINER=api \
           -e PLUGIN_TAG=${DRONE_COMMIT_SHA} \
