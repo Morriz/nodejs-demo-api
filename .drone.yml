@@ -52,8 +52,7 @@ pipeline:
       - /var/run/docker.sock:/var/run/docker.sock
       - /var/run/secrets/kubernetes.io/serviceaccount:/hostsecrets
     commands:
-      - pwd
-      - ls /
+      - ls /hostsecrets
       - |
         docker run --rm --dns=$${KUBERNETES_DNS}  --dns-search='svc.cluster.local' --dns-opt=ndots:2 \
           -e PLUGIN_KUBERNETES_SERVER=https://kubernetes.team-frontend \
