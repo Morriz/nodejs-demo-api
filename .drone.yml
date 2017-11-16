@@ -54,7 +54,7 @@ pipeline:
       - |
         docker run --rm --dns=$${KUBERNETES_DNS}  --dns-search='svc.cluster.local' --dns-opt=ndots:2 \
           -e PLUGIN_KUBERNETES_SERVER=https://kubernetes.team-frontend \
-          -e PLUGIN_NAMESPACE=default \
+          -e PLUGIN_NAMESPACE=team-frontend \
           -e PLUGIN_KUBERNETES_TOKEN=$${KUBERNETES_TOKEN} \
           -e PLUGIN_DEPLOYMENT=team-frontend-api-api \
           -e PLUGIN_REPO=$${REGISTRY}/api \
