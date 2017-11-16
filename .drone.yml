@@ -53,7 +53,7 @@ pipeline:
     commands:
       - |
         docker run --rm --dns=$${KUBERNETES_DNS}  --dns-search='svc.cluster.local' --dns-opt=ndots:2 \
-          -e PLUGIN_KUBERNETES_SERVER=https://kubernetes.team-frontend \
+          -e PLUGIN_KUBERNETES_SERVER=https://kubernetes.default \
           -e PLUGIN_NAMESPACE=team-frontend \
           -e PLUGIN_KUBERNETES_CERT=$${KUBERNETES_CERT} \
           -e PLUGIN_KUBERNETES_TOKEN=$${KUBERNETES_TOKEN} \
