@@ -2,6 +2,7 @@ const restify = require('restify')
 const env = process.env
 const server = restify.createServer()
 const Prometheus = require('prom-client')
+const packageVersion = require('./package.json').version
 
 const metricsInterval = Prometheus.collectDefaultMetrics()
 const httpRequestDurationMicroseconds = new Prometheus.Histogram({
@@ -38,7 +39,7 @@ function handler(req, res, next) {
   // do some api call
   // and send result
   setTimeout(() => {
-    res.send(`method[${method}]: ok`)
+    res.send(`method[${method}]: package version: ${packageVersion}`)
     next()
   }, Math.round(Math.random() * 200))
 }
