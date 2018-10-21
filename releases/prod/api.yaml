@@ -1,0 +1,15 @@
+apiVersion: helm.integrations.flux.weave.works/v1alpha2
+kind: FluxHelmRelease
+metadata:
+  name: team-frontend-api
+  namespace: prod
+  annotations:
+    flux.weave.works/automated: "true"
+    flux.weave.works/tag.chart-image: glob:v*
+spec:
+  chartGitPath: api
+  releaseName: team-frontend-api
+  values:
+    autoscaler:
+      maxReplicas: 10
+      targetCPUUtilizationPercentage: 50

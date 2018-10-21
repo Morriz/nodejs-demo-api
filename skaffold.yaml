@@ -1,0 +1,22 @@
+apiVersion: skaffold/v1alpha4
+kind: Config
+build:
+  artifacts:
+  - image: localhost:5000/api
+deploy:
+  helm:
+    releases:
+    - name: team-frontend-api
+      chartPath: chart
+      namespace: team-frontend
+      # valuesFiles:
+      # - values.yaml
+      #recreatePods will pass --recreate-pods to helm upgrade
+      #recreatePods: true
+      #overrides builds an override values.yaml file to run with the helm deploy
+      #overrides:
+      # some:
+      #   key: someValue
+      #setValues get appended to the helm deploy with --set.  
+      #setValues:
+        #some.key: someValue
