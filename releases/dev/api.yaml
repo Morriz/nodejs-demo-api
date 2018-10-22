@@ -10,11 +10,22 @@ spec:
   chartGitPath: api
   releaseName: team-frontend-api-dev
   values:
+    nameOverride: team-frontend-api-dev
     image: 
       repository: reg.dev.idiotz.nl/api
       tag: 07b585ae22b53ab7e6c5c35aedb85d19a2b649aa
     ingress:
       hostname: api-dev.dev.idiotz.nl
+    service:
+      annotations:
+        getambassador.io/config: |
+          apiVersion: ambassador/v0
+          kind:  Mapping
+          name:  api_mapping_dev
+          prefix: "/"
+          rewrite: ""
+          host: api-dev.dev.idiotz.nl
+          service: team-frontend-api-dev-api.dev
     autoscaler:
       maxReplicas: 3
       targetCPUUtilizationPercentage: 10

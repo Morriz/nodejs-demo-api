@@ -1,20 +1,30 @@
 apiVersion: helm.integrations.flux.weave.works/v1alpha2
 kind: FluxHelmRelease
 metadata:
-  name: team-frontend-api-rc
+  name: team-frontend-api-stg
   namespace: stg
   annotations:
     flux.weave.works/automated: "true"
     flux.weave.works/tag.chart-image: glob:stg-*
 spec:
   chartGitPath: api
-  releaseName: team-frontend-api-rc
+  releaseName: team-frontend-api-stg
   values:
+    nameOverride: team-frontend-api-stg
     image: 
       repository: reg.dev.idiotz.nl/api
       tag: latest
     ingress:
       hostname: api-stg.dev.idiotz.nl
+    service:
+      annotations:
+        getambassador.io/config: |
+          apiVersion: ambassador/v0
+          kind:  Mapping
+          name:  api_mapping_prod
+          # prefix: /
+          host: api-stg.dev.idiotz.nl
+          service: team-frontend-api-stg.stg
     autoscaler:
       maxReplicas: 5
       targetCPUUtilizationPercentage: 70

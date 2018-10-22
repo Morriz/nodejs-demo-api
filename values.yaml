@@ -3,16 +3,13 @@
 # Declare variables to be passed into your templates.
 replicaCount: 1
 autoscaler:
-  maxReplicas: 10
-  targetCPUUtilizationPercentage: 10
-annotations:
-  sidecar.istio.io/inject: 'false'
+  maxReplicas: 3
+  targetCPUUtilizationPercentage: 50
 image:
-  pullPolicy: Always
+  repository: reg.dev.idiotz.nl/api
+  tag: latest
 ingress:
-  enabled: true
-  tls: true
-  hostname: api.dev.idiotz.nl
+  hostname: api-test.dev.idiotz.nl
 resources:
   requests:
     cpu: 100m
