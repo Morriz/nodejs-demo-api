@@ -11,7 +11,7 @@ spec:
   releaseName: team-frontend-api
   values:
     image: 
-      repository: reg.dev.idiotz.nl:5000/api
+      repository: reg.dev.idiotz.nl/api
       tag: latest
     autoscaler:
       maxReplicas: 10

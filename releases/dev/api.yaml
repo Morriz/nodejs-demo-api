@@ -11,7 +11,7 @@ spec:
   releaseName: team-frontend-api-dev
   values:
     image: 
-      repository: reg.dev.idiotz.nl:5000/api
+      repository: reg.dev.idiotz.nl/api
       tag: 07b585ae22b53ab7e6c5c35aedb85d19a2b649aa
     ingress:
       hostname: api-dev.dev.idiotz.nl
