@@ -5,15 +5,13 @@ metadata:
   namespace: dev
   annotations:
     flux.weave.works/automated: "true"
-    # flux.weave.works/tag.chart-image: glob:dev-*
+    flux.weave.works/tag.chart-image: glob:dev-*
 spec:
   namespace: dev
   chartGitPath: api
   releaseName: team-frontend-dev
   values:
-    image: 
-      repository: reg.dev.idiotz.nl/api
-      tag: dev-e11c5be575873efd7fe1bdb548a6ea1de0d3541e
+    image: reg.dev.idiotz.nl/api:dev-e11c5be575873efd7fe1bdb548a6ea1de0d3541e
     ingress:
       hostname: api-dev.dev.idiotz.nl
     service:
