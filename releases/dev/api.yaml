@@ -1,3 +1,4 @@
+---
 apiVersion: helm.integrations.flux.weave.works/v1alpha2
 kind: FluxHelmRelease
 metadata:
@@ -11,9 +12,9 @@ spec:
   chartGitPath: api
   releaseName: team-frontend-dev
   values:
-    image: 
+    image:
       repository: reg.dev.idiotz.nl/api
-      tag: dev-e11c5be575873efd7fe1bdb548a6ea1de0d3541e
+      tag: dev-84e78115e22a963f1e02bce948efbd73539188b2
     ingress:
       hostname: api-dev.dev.idiotz.nl
     service:
