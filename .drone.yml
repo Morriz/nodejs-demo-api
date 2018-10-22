@@ -42,8 +42,10 @@ pipeline:
         echo building image $${IMG}
         docker build --rm -t $${IMG} .
         docker push $${IMG}
-        docker tag $${IMG} $${IMG}:${DRONE_COMMIT_SHA}
-        docker push $${IMG}:${DRONE_COMMIT_SHA}
+        docker tag $${IMG} $${IMG}:dev-${DRONE_COMMIT_SHA}
+        docker push $${IMG}:dev-${DRONE_COMMIT_SHA}
+        docker tag $${IMG} $${IMG}:latest
+        docker push $${IMG}:latest
     secrets: [registry]
 
   # deploy:
