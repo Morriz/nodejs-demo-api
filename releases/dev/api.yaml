@@ -12,7 +12,7 @@ spec:
   values:
     image: 
       repository: localhost:5000/api
-      tag: latest
+      tag: 07b585ae22b53ab7e6c5c35aedb85d19a2b649aa
     ingress:
       hostname: api-dev.dev.idiotz.nl
     autoscaler:
