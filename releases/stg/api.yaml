@@ -10,6 +10,9 @@ spec:
   chartGitPath: api
   releaseName: team-frontend-api-rc
   values:
+    image: 
+      repository: reg.dev.idiotz.nl:5000/api
+      tag: latest
     ingress:
       hostname: api-stg.dev.idiotz.nl
     autoscaler:

@@ -10,6 +10,9 @@ spec:
   chartGitPath: api
   releaseName: team-frontend-api
   values:
+    image: 
+      repository: reg.dev.idiotz.nl:5000/api
+      tag: latest
     autoscaler:
       maxReplicas: 10
       targetCPUUtilizationPercentage: 50

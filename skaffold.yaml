@@ -6,7 +6,7 @@ build:
 deploy:
   helm:
     releases:
-    - name: team-frontend-api
+    - name: team-frontend-api-dev
       chartPath: chart
       namespace: team-frontend
       # valuesFiles:

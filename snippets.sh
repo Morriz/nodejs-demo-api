@@ -6,6 +6,7 @@ helm upgrade --install team-frontend-api-flux \
 --set helmOperator.create=true \
 --set git.url=https://github.com/Morriz/nodejs-demo-api \
 --namespace team-frontend \
+--set registry.insecureHosts=localhost:5000 \
 weaveworks/flux
 
 # kubeseal get pub cert from controller:
