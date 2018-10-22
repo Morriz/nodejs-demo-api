@@ -1,3 +1,13 @@
+# DIY, as opposed to setting it all up in mostack:
+# they chose it, so let team-frontend install flux operator
+# @todo: they need their own tiller for that
+helm upgrade --install team-frontend-api-flux \
+--set rbac.create=true \
+--set helmOperator.create=true \
+--set git.url=https://github.com/Morriz/nodejs-demo-api \
+--namespace team-frontend \
+weaveworks/flux
+# 
 # kubeseal get pub cert from controller:
 kubeseal --fetch-cert \
 --controller-namespace=team-frontend \
