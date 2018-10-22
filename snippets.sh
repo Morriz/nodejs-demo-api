@@ -9,7 +9,10 @@ helm upgrade --install team-frontend-api-flux \
 weaveworks/flux
 
 # kubeseal get pub cert from controller:
-kubeseal --fetch-cert > pub-cert.pem
+kubeseal --fetch-cert \
+--controller-namespace=team-frontend \
+--controller-name=sealed-secrets \
+> pub-cert.pem
 
 # secret creation:
 kubectl -n dev create secret generic basic-auth \
