@@ -46,23 +46,23 @@ pipeline:
         docker push $${IMG}:${DRONE_COMMIT_SHA}
     secrets: [registry]
 
-  deploy:
-    image: docker
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-    commands:
-      - |
-        docker run --rm --dns=$${KUBERNETES_DNS}  --dns-search='svc.cluster.local' --dns-opt=ndots:2 \
-          -e PLUGIN_KUBERNETES_SERVER=https://kubernetes.default \
-          -e PLUGIN_NAMESPACE=team-frontend \
-          -e PLUGIN_KUBERNETES_CERT=$${KUBERNETES_CERT} \
-          -e PLUGIN_KUBERNETES_TOKEN=$${KUBERNETES_TOKEN} \
-          -e PLUGIN_DEPLOYMENT=team-frontend-api-api \
-          -e PLUGIN_REPO=$${REGISTRY}/api \
-          -e PLUGIN_CONTAINER=api \
-          -e PLUGIN_TAG=${DRONE_COMMIT_SHA} \
-          quay.io/honestbee/drone-kubernetes
-    secrets: [registry, kubernetes_dns, kubernetes_cert, kubernetes_token]
+  # deploy:
+  #   image: docker
+  #   volumes:
+  #     - /var/run/docker.sock:/var/run/docker.sock
+  #   commands:
+  #     - |
+  #       docker run --rm --dns=$${KUBERNETES_DNS}  --dns-search='svc.cluster.local' --dns-opt=ndots:2 \
+  #         -e PLUGIN_KUBERNETES_SERVER=https://kubernetes.default \
+  #         -e PLUGIN_NAMESPACE=team-frontend \
+  #         -e PLUGIN_KUBERNETES_CERT=$${KUBERNETES_CERT} \
+  #         -e PLUGIN_KUBERNETES_TOKEN=$${KUBERNETES_TOKEN} \
+  #         -e PLUGIN_DEPLOYMENT=team-frontend-api-api \
+  #         -e PLUGIN_REPO=$${REGISTRY}/api \
+  #         -e PLUGIN_CONTAINER=api \
+  #         -e PLUGIN_TAG=${DRONE_COMMIT_SHA} \
+  #         quay.io/honestbee/drone-kubernetes
+  #   secrets: [registry, kubernetes_dns, kubernetes_cert, kubernetes_token]
 
   rebuild_cache_stage_2:
     image: drillster/drone-volume-cache:latest
