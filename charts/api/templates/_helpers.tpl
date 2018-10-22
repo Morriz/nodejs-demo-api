@@ -15,9 +15,9 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 {{- printf "%s-%s" .Release.Name $name | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
-{{- define "image" -}}
-{{- if .Values. overrideMyImageFullName -}}
-{{- .Values. overrideMyImageFullName -}}
+{{- define "imagetag" -}}
+{{- if .Values.overrideMyImageFullName -}}
+{{- .Values.overrideMyImageFullName -}}
 {{- else -}}
 {{- printf "%s/:%s" .Values.image.repository .Values.image.tag -}}
 {{- end -}}
