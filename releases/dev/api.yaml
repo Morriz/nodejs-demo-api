@@ -11,7 +11,7 @@ spec:
   releaseName: team-frontend-api-dev
   values:
     image: 
-      repository: http://localhost:5000/api
+      repository: localhost:5000/api
       tag: latest
     ingress:
       hostname: api-dev.dev.idiotz.nl
