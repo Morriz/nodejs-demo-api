@@ -1,16 +1,16 @@
 apiVersion: helm.integrations.flux.weave.works/v1alpha2
 kind: FluxHelmRelease
 metadata:
-  name: team-frontend-api-dev
+  name: team-frontend-dev-api
   namespace: dev
   annotations:
     flux.weave.works/automated: "true"
     flux.weave.works/tag.chart-image: glob:*
 spec:
+  namespace: dev
   chartGitPath: api
-  releaseName: team-frontend-api-dev
+  releaseName: team-frontend-dev
   values:
-    nameOverride: team-frontend-api-dev
     image: 
       repository: reg.dev.idiotz.nl/api
       tag: 07b585ae22b53ab7e6c5c35aedb85d19a2b649aa
@@ -25,7 +25,7 @@ spec:
           prefix: "/"
           rewrite: ""
           host: api-dev.dev.idiotz.nl
-          service: team-frontend-api-dev-api.dev
+          service: team-frontend-dev-api.dev
     autoscaler:
       maxReplicas: 3
       targetCPUUtilizationPercentage: 10
