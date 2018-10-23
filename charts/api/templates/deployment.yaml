@@ -20,7 +20,7 @@ spec:
       containers:
         - name: {{ .Chart.Name }}
           image: {{ template "imagetag" . }}
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          imagePullPolicy: {{ .Values.pullPolicy }}
           ports:
             - containerPort: {{ .Values.service.http.internalPort }}
           livenessProbe:

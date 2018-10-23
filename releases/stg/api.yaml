@@ -13,7 +13,7 @@ spec:
   values:
     image: reg.dev.idiotz.nl/api:latest
     ingress:
-      hostname: api.dev.idiotz.nl
+      hostname: api-stg.dev.idiotz.nl
     service:
       annotations:
         getambassador.io/config: |
@@ -21,7 +21,7 @@ spec:
           kind:  Mapping
           name:  api_mapping_stg
           # prefix: /
-          host: api.dev.idiotz.nl
+          host: api-stg.dev.idiotz.nl
           service: team-frontend-stg-api.stg
     autoscaler:
       maxReplicas: 10

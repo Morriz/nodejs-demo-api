@@ -5,9 +5,7 @@ replicaCount: 1
 autoscaler:
   maxReplicas: 3
   targetCPUUtilizationPercentage: 50
-image:
-  repository: reg.dev.idiotz.nl/api
-  tag: latest
+image: reg.dev.idiotz.nl/api:latest
 ingress:
   hostname: api-test.dev.idiotz.nl
 resources:

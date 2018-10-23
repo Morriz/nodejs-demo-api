@@ -7,10 +7,8 @@ autoscaler:
   targetCPUUtilizationPercentage: 10
 annotations:
   sidecar.istio.io/inject: 'false'
-image:
-  repository: localhost:5000/api
-  tag: latest
-  pullPolicy: Always
+image: localhost:5000/api:latest
+pullPolicy: Always
 service:
   http:
     externalPort: 80
