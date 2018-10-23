@@ -32,7 +32,7 @@ function handler(req, res, next) {
     return next()
   }
   if (methods.private.includes(method) && (key === '' || secret === '')) {
-    res.send(401, 'Unauthorized')
+    res.send(401, 'Unauthorizeddd')
     return next()
   }
 
