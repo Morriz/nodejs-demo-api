@@ -12,7 +12,7 @@ spec:
   chartGitPath: api
   releaseName: team-frontend-dev
   values:
-    image: reg.dev.idiotz.nl/api:dev-693d30b5ea76187487b4a467263e2bdf19468e80
+    image: reg.dev.idiotz.nl/api:latest
     ingress:
       hostname: api-dev.dev.idiotz.nl
     service:

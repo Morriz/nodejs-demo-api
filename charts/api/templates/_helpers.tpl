@@ -19,6 +19,6 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 {{- if .Values.overrideMyImageFullName -}}
 {{- .Values.overrideMyImageFullName -}}
 {{- else -}}
-{{- printf "%s" .Values.image  -}}
+{{- printf "%s" .Values.image -}}
 {{- end -}}
 {{- end -}}
