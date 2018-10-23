@@ -11,7 +11,9 @@ spec:
   chartGitPath: api
   releaseName: team-frontend-prod
   values:
-    image: reg.dev.idiotz.nl/api:latest
+    image: 
+      repository: reg.dev.idiotz.nl/api
+      tag: latest
     ingress:
       hostname: api.dev.idiotz.nl
     service:
