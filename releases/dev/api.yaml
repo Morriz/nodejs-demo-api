@@ -14,7 +14,7 @@ spec:
   values:
     image:
       repository: reg.dev.idiotz.nl/api
-      tag: dev-388ea25416b55434d26e781ea18a0300516e90b5
+      tag: dev-a1cdbbbc1c1384552dd8c07a1aa5e4c6dde2eb5f
     ingress:
       hostname: api-dev.dev.idiotz.nl
     service:
