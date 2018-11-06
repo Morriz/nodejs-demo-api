@@ -7,7 +7,7 @@ autoscaler:
   targetCPUUtilizationPercentage: 50
 image: reg.dev.idiotz.nl/api:latest
 ingress:
-  hostname: api-test.dev.idiotz.nl
+  hostname: api.dev.idiotz.nl
 resources:
   requests:
     cpu: 100m
