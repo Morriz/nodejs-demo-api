@@ -25,7 +25,8 @@ steps:
       - npm test
     when:
       branch:
-        exclude: [master]
+        exclude:
+          - master
 
   - name: build
     image: docker
@@ -35,13 +36,15 @@ steps:
     commands:
       - |
         IMG=$${REGISTRY}/api
-        echo building image $${IMG}
-        docker build --rm -t $${IMG} .
-        docker tag $${IMG} $${IMG}:dev-${DRONE_COMMIT_SHA}
-        docker push $${IMG}:dev-${DRONE_COMMIT_SHA}
-        docker tag $${IMG} $${IMG}:latest
-        docker push $${IMG}:latest
-    secrets: [registry]
+        echo building image api
+        docker build --rm -t api .
+        docker tag api api:dev-${DRONE_COMMIT_SHA}
+        docker push api:dev-${DRONE_COMMIT_SHA}
+        docker tag api api:latest
+        docker push api:latest
+    environment:
+      REGISTRY:
+        from_secret: registry
 
   - name: rebuild_cache
     image: drillster/drone-volume-cache:latest
