@@ -10,58 +10,58 @@ kind: pipeline
 name: default
 
 steps:
-- name: restore_cache
-  image: drillster/drone-volume-cache:latest
-  settings:
-    restore: true
-    mount:
-      - ./node_modules
+  - name: restore_cache
+    image: drillster/drone-volume-cache:latest
+    settings:
+      restore: true
+      mount:
+        - ./node_modules
+      volumes:
+        - /tmp/cache:/cache # everything in this folder is inflated here and cached later:
+  - name: test
+    image: node:11.14
+    commands:
+      - npm install
+      - npm test
+    when:
+      branch:
+        exclude: [master]
+
+  - name: build
+    image: docker
     volumes:
-      - /tmp/cache:/cache    # everything in this folder is inflated here and cached later:
-- name: test
-  image: node:11.14
-  commands:
-    - npm install
-    - npm test
-  when:
-    branch:
-      exclude: [ master ]
+      - name: docker
+        path: /var/run/docker.sock
+    commands:
+      - |
+        IMG=$${REGISTRY}/api
+        echo building image $${IMG}
+        docker build --rm -t $${IMG} .
+        docker tag $${IMG} $${IMG}:dev-${DRONE_COMMIT_SHA}
+        docker push $${IMG}:dev-${DRONE_COMMIT_SHA}
+        docker tag $${IMG} $${IMG}:latest
+        docker push $${IMG}:latest
+    secrets: [registry]
 
-- name: build:
-  image: docker
-  volumes:
-  - name: docker
-    path: /var/run/docker.sock
-  commands:
-    - |
-      IMG=$${REGISTRY}/api
-      echo building image $${IMG}
-      docker build --rm -t $${IMG} .
-      docker tag $${IMG} $${IMG}:dev-${DRONE_COMMIT_SHA}
-      docker push $${IMG}:dev-${DRONE_COMMIT_SHA}
-      docker tag $${IMG} $${IMG}:latest
-      docker push $${IMG}:latest
-  secrets: [registry]
+  - name: rebuild_cache
+    image: drillster/drone-volume-cache:latest
+    settings:
+      rebuild: true
+      mount:
+        - ./node_modules
+      volumes:
+        - /tmp/cache:/cache # everything in this folder is inflated here and cached later:
 
-- name: rebuild_cache:
-  image: drillster/drone-volume-cache:latest
-  settings:
-  rebuild: true
-    mount:
-      - ./node_modules
-    volumes:
-      - /tmp/cache:/cache    # everything in this folder is inflated here and cached later:
-
-- name: slack:
-  image: plugins/slack
-  settings:
-    webhook: https://hooks.slack.com/services/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
-    channel: drone-build
-    username: Drone
-  when:
-    status: [ success, failure ]
+  - name: slack
+    image: plugins/slack
+    settings:
+      webhook: https://hooks.slack.com/services/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
+      channel: drone-build
+      username: Drone
+    when:
+      status: [success, failure]
 
 volumes:
-- name: docker
-  host:
-    path: /var/run/docker.sock
+  - name: docker
+    host:
+      path: /var/run/docker.sock
