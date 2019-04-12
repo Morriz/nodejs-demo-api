@@ -5,77 +5,63 @@
 #
 # @see https://blogs.technet.microsoft.com/devops/2016/06/21/a-git-workflow-for-continuous-delivery/
 # @see http://blog.launchdarkly.com/is-it-a-feature-flag-or-a-feature-toggle/
-pipeline:
 
-  restore_cache:
-    image: drillster/drone-volume-cache:latest
+kind: pipeline
+name: default
+
+steps:
+- name: restore_cache
+  image: drillster/drone-volume-cache:latest
+  settings:
     restore: true
     mount:
-      # everything in this folder is inflated here and cached later:
-      - /drone
-
-  test:
-    image: node:8.5
-    commands:
-      - |
-        echo "cache = /drone/.npm" > .npmrc
-      - npm install
-      - npm test
-    when:
-      branch:
-        exclude: [ master ]
-
-  # caching this stage already in case the next phase borks
-  rebuild_cache_stage_1:
-    image: drillster/drone-volume-cache:latest
-    rebuild: true
-    mount:
-      - /drone
-
-  build:
-    image: docker
+      - ./node_modules
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-    commands:
-      - |
-        IMG=$${REGISTRY}/api
-        echo building image $${IMG}
-        docker build --rm -t $${IMG} .
-        docker tag $${IMG} $${IMG}:dev-${DRONE_COMMIT_SHA}
-        docker push $${IMG}:dev-${DRONE_COMMIT_SHA}
-        docker tag $${IMG} $${IMG}:latest
-        docker push $${IMG}:latest
-    secrets: [registry]
+      - /tmp/cache:/cache    # everything in this folder is inflated here and cached later:
+- name: test
+  image: node:11.14
+  commands:
+    - npm install
+    - npm test
+  when:
+    branch:
+      exclude: [ master ]
 
-  # deploy:
-  #   image: docker
-  #   volumes:
-  #     - /var/run/docker.sock:/var/run/docker.sock
-  #   commands:
-  #     - |
-  #       docker run --rm --dns=$${KUBERNETES_DNS}  --dns-search='svc.cluster.local' --dns-opt=ndots:2 \
-  #         -e PLUGIN_KUBERNETES_SERVER=https://kubernetes.default \
-  #         -e PLUGIN_NAMESPACE=team-frontend \
-  #         -e PLUGIN_KUBERNETES_CERT=$${KUBERNETES_CERT} \
-  #         -e PLUGIN_KUBERNETES_TOKEN=$${KUBERNETES_TOKEN} \
-  #         -e PLUGIN_DEPLOYMENT=team-frontend-api-api \
-  #         -e PLUGIN_REPO=$${REGISTRY}/api \
-  #         -e PLUGIN_CONTAINER=api \
-  #         -e PLUGIN_TAG=${DRONE_COMMIT_SHA} \
-  #         quay.io/honestbee/drone-kubernetes
-  #   secrets: [registry, kubernetes_dns, kubernetes_cert, kubernetes_token]
+- name: build:
+  image: docker
+  volumes:
+  - name: docker
+    path: /var/run/docker.sock
+  commands:
+    - |
+      IMG=$${REGISTRY}/api
+      echo building image $${IMG}
+      docker build --rm -t $${IMG} .
+      docker tag $${IMG} $${IMG}:dev-${DRONE_COMMIT_SHA}
+      docker push $${IMG}:dev-${DRONE_COMMIT_SHA}
+      docker tag $${IMG} $${IMG}:latest
+      docker push $${IMG}:latest
+  secrets: [registry]
 
-  rebuild_cache_stage_2:
-    image: drillster/drone-volume-cache:latest
-    rebuild: true
+- name: rebuild_cache:
+  image: drillster/drone-volume-cache:latest
+  settings:
+  rebuild: true
     mount:
-      - /drone
+      - ./node_modules
+    volumes:
+      - /tmp/cache:/cache    # everything in this folder is inflated here and cached later:
 
-  slack:
-    image: plugins/slack
+- name: slack:
+  image: plugins/slack
+  settings:
     webhook: https://hooks.slack.com/services/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
     channel: drone-build
     username: Drone
-    when:
-      status: [ success, failure ]
+  when:
+    status: [ success, failure ]
 
+volumes:
+- name: docker
+  host:
+    path: /var/run/docker.sock
