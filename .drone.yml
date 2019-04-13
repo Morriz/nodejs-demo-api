@@ -1,16 +1,7 @@
-# We assume GitHub flow is used, and we simply deploy all feature branches to production.
-# Feature flags are built into the software so we don't deal with it in our CD setup.
-# If an error occurred kubernetes rolls back automatically.
-# The feature is later merged in branch master when the feature behaves ok.
-#
-# @see https://blogs.technet.microsoft.com/devops/2016/06/21/a-git-workflow-for-continuous-delivery/
-# @see http://blog.launchdarkly.com/is-it-a-feature-flag-or-a-feature-toggle/
-
 kind: pipeline
 name: default
 
 steps:
-
   - name: build-branch
     image: plugins/docker
     settings:
@@ -24,7 +15,48 @@ steps:
         - reg.dev.idiotz.nl/api:${DRONE_BRANCH}
     when:
       branch:
-        - !master
+        exclude:
+          - master
+
+  - name: build-tags
+    image: plugins/docker
+    settings:
+      repo: reg.dev.idiotz.nl/api
+      tags:
+        - ${DRONE_TAG}
+
+      cache_from:
+        - reg.dev.idiotz.nl/api:master
+    when:
+      event:
+        - tag
+
+  - name: slack
+    image: plugins/slack
+    settings:
+      webhook: https://hooks.slack.com/services/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
+      channel: drone-build
+      username: Drone
+    when:
+      status:
+        - success
+        - failure
+steps:
+  - name: build-branch
+    image: plugins/docker
+    settings:
+      repo: reg.dev.idiotz.nl/api
+      tags:
+        - ${DRONE_BRANCH}
+        - ${DRONE_BRANCH}-${DRONE_COMMIT}
+
+      cache_from:
+        - reg.dev.idiotz.nl/api:latest
+        - reg.dev.idiotz.nl/api:${DRONE_BRANCH}
+    when:
+      branch:
+        exclude:
+          - master
 
   - name: build-tags
     image: plugins/docker
