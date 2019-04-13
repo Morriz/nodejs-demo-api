@@ -1,12 +1,10 @@
 # dev stage
 FROM node:11.14-alpine as dev
 
-# RUN apk --no-cache add make gcc g++ python
-
-RUN which node
-RUN ls -als /usr/lib/lib*
+RUN apk --no-cache add make gcc g++ python
 
 ENV NODE_ENV=development
+ENV BLUEBIRD_DEBUG=0
 
 RUN mkdir /home/node/app
 WORKDIR /home/node/app
@@ -32,7 +30,7 @@ RUN npm prune --production
 # prod stage
 FROM alpine:3.9 AS prod
 
-COPY --from=dev /usr/localbin/node /usr/bin/
+COPY --from=dev /usr/local/bin/node /usr/bin/
 COPY --from=dev /usr/lib/libgcc* /usr/lib/libstdc* /usr/lib/
 
 RUN mkdir /home/node/app
