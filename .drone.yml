@@ -18,6 +18,7 @@ steps:
       tags:
         - ${DRONE_COMMIT_SHA}
         - latest
+      cache_from: "laszlocloud/cache-from-test:latest"
 
   - name: slack
     image: plugins/slack
