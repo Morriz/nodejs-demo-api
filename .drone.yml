@@ -35,13 +35,13 @@ steps:
         path: /var/run
     commands:
       - |
-        IMG=$${REGISTRY}/api
-        echo building image api
-        docker build --rm -t api .
-        docker tag api api:dev-${DRONE_COMMIT_SHA}
-        docker push api:dev-${DRONE_COMMIT_SHA}
-        docker tag api api:latest
-        docker push api:latest
+        IMG=reg.dev.idiotz.nl/api
+        echo building image $${IMG}
+        docker build --rm -t $${IMG} .
+        docker tag $${IMG} $${IMG}:dev-${DRONE_COMMIT_SHA}
+        docker push $${IMG}:dev-${DRONE_COMMIT_SHA}
+        docker tag $${IMG} $${IMG}:latest
+        docker push $${IMG}:latest
     environment:
       REGISTRY:
         from_secret: registry
