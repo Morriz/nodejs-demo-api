@@ -3,6 +3,9 @@ FROM node:11.14-alpine as dev
 
 # RUN apk --no-cache add make gcc g++ python
 
+RUN which node
+RUN ls -als /usr/lib/lib*
+
 ENV NODE_ENV=development
 
 RUN mkdir /home/node/app
@@ -29,8 +32,8 @@ RUN npm prune --production
 # prod stage
 FROM alpine:3.9 AS prod
 
-COPY --from=ci /usr/bin/node /usr/bin/
-COPY --from=ci /usr/lib/libgcc* /usr/lib/libstdc* /usr/lib/
+COPY --from=dev /usr/localbin/node /usr/bin/
+COPY --from=dev /usr/lib/libgcc* /usr/lib/libstdc* /usr/lib/
 
 RUN mkdir /home/node/app
 WORKDIR /home/node/app
