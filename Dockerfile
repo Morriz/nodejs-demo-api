@@ -12,6 +12,7 @@ WORKDIR /home/node/app
 
 COPY package*.json ./
 
+RUN ls -als
 RUN npm install
 
 COPY . ./
@@ -24,6 +25,7 @@ ENV NODE_ENV=test
 
 # this example test is not necessary as tests should be executed in parallel (on a good CI runner)
 # by calling this 'ci' stage with different commands (i.e. npm run test:lint)
+RUN ls -als
 RUN npm test 
 
 RUN npm prune --production
@@ -31,9 +33,13 @@ RUN npm prune --production
 # prod stage
 FROM node:11.2-alpine AS prod
 
+RUN mkdir /home/node/app
+WORKDIR /home/node/app
+
 ENV NODE_ENV=production
 
-COPY --from=ci --chown=node:node . .
+COPY --from=ci --chown=node:node /home/node/app .
+RUN ls -als
 
 USER node
 
