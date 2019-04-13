@@ -10,50 +10,13 @@ kind: pipeline
 name: default
 
 steps:
-  - name: restore_cache
-    image: drillster/drone-volume-cache:latest
-    settings:
-      restore: true
-      mount:
-        - ./node_modules
-      volumes:
-        - /tmp/cache:/cache # everything in this folder is inflated here and cached later:
-  - name: test
-    image: node:11.14
-    commands:
-      - npm install
-      - npm test
-    when:
-      branch:
-        exclude:
-          - master
 
   - name: build
-    image: docker
-    volumes:
-      - name: dockersock
-        path: /var/run
-    commands:
-      - |
-        IMG=reg.dev.idiotz.nl/api
-        echo building image $${IMG}
-        docker build --rm -t $${IMG} .
-        docker tag $${IMG} $${IMG}:dev-${DRONE_COMMIT_SHA}
-        docker push $${IMG}:dev-${DRONE_COMMIT_SHA}
-        docker tag $${IMG} $${IMG}:latest
-        docker push $${IMG}:latest
-    environment:
-      REGISTRY:
-        from_secret: registry
-
-  - name: rebuild_cache
-    image: drillster/drone-volume-cache:latest
-    settings:
-      rebuild: true
-      mount:
-        - ./node_modules
-      volumes:
-        - /tmp/cache:/cache # everything in this folder is inflated here and cached later:
+    image: plugins/docker
+    repo: reg.dev.idiotz.nl/api
+    tags:
+      - ${DRONE_COMMIT_SHA}
+      - latest
 
   - name: slack
     image: plugins/slack
@@ -65,7 +28,3 @@ steps:
       status:
         - success
         - failure
-
-volumes:
-  - name: dockersock
-    temp: {}
