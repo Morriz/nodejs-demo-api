@@ -13,10 +13,11 @@ steps:
 
   - name: build
     image: plugins/docker
-    repo: reg.dev.idiotz.nl/api
-    tags:
-      - ${DRONE_COMMIT_SHA}
-      - latest
+    settings:
+      repo: reg.dev.idiotz.nl/api
+      tags:
+        - ${DRONE_COMMIT_SHA}
+        - latest
 
   - name: slack
     image: plugins/slack
