@@ -30,9 +30,9 @@ steps:
 
   - name: build
     image: docker
-    # volumes:
-    #   - name: docker
-    #     path: /var/run/docker.sock
+    volumes:
+      - name: dockersock
+        path: /var/run
     commands:
       - |
         IMG=$${REGISTRY}/api
@@ -62,9 +62,10 @@ steps:
       channel: drone-build
       username: Drone
     when:
-      status: [success, failure]
+      status:
+        - success
+        - failure
 
-# volumes:
-#   - name: docker
-#     host:
-#       path: /var/run/docker.sock
+volumes:
+  - name: dockersock
+    temp: {}
