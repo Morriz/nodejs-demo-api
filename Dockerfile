@@ -33,14 +33,12 @@ FROM alpine:3.9 AS prod
 COPY --from=dev /usr/local/bin/node /usr/bin/
 COPY --from=dev /usr/lib/libgcc* /usr/lib/libstdc* /usr/lib/
 
-RUN mkdir /home/node/app
-WORKDIR /home/node/app
+RUN mkdir /app
+WORKDIR /app
 
 ENV NODE_ENV=production
 
 COPY --from=ci --chown=node:node node_modules node_modules
 COPY --from=ci --chown=node:node server.js .
-
-USER node
 
 CMD ["node", "server.js"]
