@@ -23,14 +23,14 @@ ENV NODE_ENV=test
 
 RUN npm test
 
+RUN npm prune --production
+
 # prod stage
-FROM ci AS prod
+FROM node:11.2-alpine AS prod
 
 ENV NODE_ENV=production
 
-RUN npm prune --production
-
-RUN chown -R node .
+COPY --from=ci --chown=node:node /home/node/app/ ./
 
 USER node
 
