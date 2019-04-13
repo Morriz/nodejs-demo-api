@@ -18,11 +18,26 @@ steps:
       tags:
         - ${DRONE_BRANCH}
         - ${DRONE_BRANCH}-${DRONE_COMMIT}
-        - latest
 
       cache_from:
         - reg.dev.idiotz.nl/api:master
         - reg.dev.idiotz.nl/api:${DRONE_BRANCH}
+    when:
+      branch:
+        - !master
+
+  - name: build
+    image: plugins/docker
+    settings:
+      repo: reg.dev.idiotz.nl/api
+      tags:
+        - stg-${DRONE_TAG}
+
+      cache_from:
+        - reg.dev.idiotz.nl/api:master
+    when:
+      event:
+        - tag
 
   - name: slack
     image: plugins/slack
