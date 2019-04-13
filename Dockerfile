@@ -21,7 +21,9 @@ FROM dev as ci
 ARG CI=true
 ENV NODE_ENV=test
 
-RUN npm test
+# this example test is not necessary as tests should be executed in parallel (on a good CI runner)
+# by calling this 'ci' stage with different commands (i.e. npm run test:lint)
+RUN npm test 
 
 RUN npm prune --production
 
@@ -30,7 +32,7 @@ FROM node:11.2-alpine AS prod
 
 ENV NODE_ENV=production
 
-COPY --from=ci --chown=node:node /home/node/app/ ./
+COPY --from=ci --chown=node:node /home/node/app/package.json  /home/node/app/server.js /home/node/app/node_modules ./
 
 USER node
 
