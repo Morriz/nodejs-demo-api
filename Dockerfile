@@ -1,7 +1,7 @@
 # dev stage
-FROM mhart/alpine-node:11.14 as dev
+FROM node:11.14-alpine as dev
 
-RUN apk --no-cache add make gcc g++ python
+# RUN apk --no-cache add make gcc g++ python
 
 ENV NODE_ENV=development
 
