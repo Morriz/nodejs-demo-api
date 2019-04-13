@@ -29,8 +29,8 @@ RUN npm prune --production
 # prod stage
 FROM alpine:3.9 AS prod
 
-COPY --from=0 /usr/bin/node /usr/bin/
-COPY --from=0 /usr/lib/libgcc* /usr/lib/libstdc* /usr/lib/
+COPY --from=ci /usr/bin/node /usr/bin/
+COPY --from=ci /usr/lib/libgcc* /usr/lib/libstdc* /usr/lib/
 
 RUN mkdir /home/node/app
 WORKDIR /home/node/app
