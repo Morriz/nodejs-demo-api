@@ -38,6 +38,6 @@ RUN mkdir /app
 WORKDIR /app
 
 COPY --from=ci /app/node_modules node_modules
-COPY --from=ci /app/server.js .
+COPY --from=ci /app/package.json /app/server.js .
 
 CMD ["node", "server.js"]
