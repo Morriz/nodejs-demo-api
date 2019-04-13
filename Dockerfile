@@ -10,9 +10,10 @@ ENV NODE_ENV=development
 RUN mkdir /home/node/app
 WORKDIR /home/node/app
 
-COPY package-lock.json ./
-COPY package.json ./
+COPY package*.json ./
+
 RUN npm install
+
 COPY . ./
 
 # ci stage
@@ -32,7 +33,7 @@ FROM node:11.2-alpine AS prod
 
 ENV NODE_ENV=production
 
-COPY --from=ci --chown=node:node /home/node/app/package.json  /home/node/app/server.js /home/node/app/node_modules ./
+COPY --from=ci --chown=node:node . .
 
 USER node
 
