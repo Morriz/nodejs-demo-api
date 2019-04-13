@@ -11,7 +11,7 @@ name: default
 
 steps:
 
-  - name: build
+  - name: build-branch
     image: plugins/docker
     settings:
       repo: reg.dev.idiotz.nl/api
@@ -20,18 +20,18 @@ steps:
         - ${DRONE_BRANCH}-${DRONE_COMMIT}
 
       cache_from:
-        - reg.dev.idiotz.nl/api:master
+        - reg.dev.idiotz.nl/api:latest
         - reg.dev.idiotz.nl/api:${DRONE_BRANCH}
     when:
       branch:
         - !master
 
-  - name: build
+  - name: build-tags
     image: plugins/docker
     settings:
       repo: reg.dev.idiotz.nl/api
       tags:
-        - stg-${DRONE_TAG}
+        - ${DRONE_TAG}
 
       cache_from:
         - reg.dev.idiotz.nl/api:master
