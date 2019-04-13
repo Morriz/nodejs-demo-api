@@ -15,7 +15,6 @@ steps:
     image: plugins/docker
     settings:
       repo: reg.dev.idiotz.nl/api
-      insecure: true
       tags:
         - ${DRONE_COMMIT_SHA}
         - latest
