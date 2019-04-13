@@ -16,9 +16,13 @@ steps:
     settings:
       repo: reg.dev.idiotz.nl/api
       tags:
-        - ${DRONE_COMMIT_SHA}
+        - ${DRONE_BRANCH}
+        - ${DRONE_BRANCH}-${DRONE_COMMIT}
         - latest
-      cache_from: "laszlocloud/cache-from-test:latest"
+
+      cache_from:
+        - reg.dev.idiotz.nl/api:master
+        - reg.dev.idiotz.nl/api:${DRONE_BRANCH}
 
   - name: slack
     image: plugins/slack
