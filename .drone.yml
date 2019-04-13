@@ -30,9 +30,9 @@ steps:
 
   - name: build
     image: docker
-    volumes:
-      - name: docker
-        path: /var/run/docker.sock
+    # volumes:
+    #   - name: docker
+    #     path: /var/run/docker.sock
     commands:
       - |
         IMG=$${REGISTRY}/api
@@ -64,7 +64,7 @@ steps:
     when:
       status: [success, failure]
 
-volumes:
-  - name: docker
-    host:
-      path: /var/run/docker.sock
+# volumes:
+#   - name: docker
+#     host:
+#       path: /var/run/docker.sock
