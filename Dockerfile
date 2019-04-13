@@ -1,10 +1,8 @@
 # dev stage
-FROM node:11.2-alpine as dev
+FROM mhart/alpine-node:11.14 as dev
 
-RUN apk --no-cache add python make g++
+RUN apk --no-cache add make gcc g++ python
 
-ARG PORT=5000
-ENV PORT=${PORT}
 ENV NODE_ENV=development
 
 RUN mkdir /home/node/app
@@ -12,8 +10,7 @@ WORKDIR /home/node/app
 
 COPY package*.json ./
 
-RUN ls -als
-RUN npm install
+RUN npm ci
 
 COPY . ./
 
@@ -25,24 +22,24 @@ ENV NODE_ENV=test
 
 # this example test is not necessary as tests should be executed in parallel (on a good CI runner)
 # by calling this 'ci' stage with different commands (i.e. npm run test:lint)
-RUN ls -als
 RUN npm test 
 
 RUN npm prune --production
 
 # prod stage
-FROM node:11.2-alpine AS prod
+FROM alpine:3.9 AS prod
+
+COPY --from=0 /usr/bin/node /usr/bin/
+COPY --from=0 /usr/lib/libgcc* /usr/lib/libstdc* /usr/lib/
 
 RUN mkdir /home/node/app
 WORKDIR /home/node/app
 
 ENV NODE_ENV=production
 
-COPY --from=ci --chown=node:node /home/node/app .
-RUN ls -als
+COPY --from=ci --chown=node:node node_modules node_modules
+COPY --from=ci --chown=node:node server.js .
 
 USER node
 
-CMD ["npm", "start"]
-
-EXPOSE 5000
+CMD ["node", "server.js"]
