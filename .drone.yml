@@ -33,7 +33,9 @@ steps:
   - name: ci-lint
     image: reg.dev.idiotz.nl/api:${DRONE_BRANCH}-ci
     commands:
-      - export PATH=./node_modules/.bin:$PATH
+      - export PATH="./node_modules/.bin:$PATH"
+      - echo $$PATH
+      - echo $PATH
       - npm run lint
     depends_on:
       - build-ci
