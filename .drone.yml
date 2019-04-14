@@ -31,19 +31,16 @@ steps:
         - pull_request
 
   - name: ci-lint
-    depends_upon: ci
     image: reg.dev.idiotz.nl/api:${DRONE_BRANCH}-ci
     commands:
-      - export PATH=./node_modules/.bin:$PATh
+      - export PATH=./node_modules/.bin:$PATH
       - npm run lint
     depends_on:
       - build-ci
 
   - name: ci-test
-    depends_upon: ci
     image: reg.dev.idiotz.nl/api:${DRONE_BRANCH}-ci
     commands:
-      - export PATH=./node_modules/.bin:$PATh
       - npm test
     depends_on:
       - build-ci
