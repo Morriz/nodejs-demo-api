@@ -21,7 +21,7 @@ server.use(restify.plugins.bodyParser())
 server.use(restify.plugins.queryParser())
 
 function handler(req, res, next) {
-  // bla
+  // bladibla
   const qry = req.query || {}
   const key = qry.key || ''
   const secret = qry.secret || ''

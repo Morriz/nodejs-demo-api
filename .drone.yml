@@ -4,6 +4,8 @@ name: default
 steps:
   - name: build-branch
     image: plugins/docker
+    username: drone
+    password: blabla
     settings:
       repo: reg.dev.idiotz.nl/api
       tags:
