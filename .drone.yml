@@ -34,7 +34,6 @@ steps:
     image: reg.dev.idiotz.nl/api:${DRONE_BRANCH}-ci
     commands:
       - export PATH="./node_modules/.bin:$PATH"
-      - ls -als ./node_modules/.bin
       - npm run lint
     depends_on:
       - build-ci
