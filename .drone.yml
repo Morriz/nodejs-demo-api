@@ -75,3 +75,7 @@ steps:
       status:
         - success
         - failure
+    depends_on:
+      - ci-lint
+      - ci-test
+      - build-final
