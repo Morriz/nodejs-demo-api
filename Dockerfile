@@ -13,7 +13,7 @@ COPY package*.json ./
 
 RUN npm ci
 
-COPY . ./
+COPY . .* ./
 
 # ci stage for CI runner
 FROM dev as ci
