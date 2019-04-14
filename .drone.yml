@@ -34,6 +34,7 @@ steps:
     depends_upon: ci
     image: reg.dev.idiotz.nl/api:${DRONE_BRANCH}-ci
     commands:
+      - export PATH=./node_modules/.bin:$PATh
       - npm run lint
     depends_on:
       - build-ci
@@ -42,6 +43,7 @@ steps:
     depends_upon: ci
     image: reg.dev.idiotz.nl/api:${DRONE_BRANCH}-ci
     commands:
+      - export PATH=./node_modules/.bin:$PATh
       - npm test
     depends_on:
       - build-ci
