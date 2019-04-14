@@ -41,7 +41,7 @@ function handler(req, res, next) {
   // do some api call
   // and send result
   setTimeout(() => {
-    res.send(`xmethod[${method}]: package version: ${packageVersion}`)
+    res.send(`method[${method}]: package version: ${packageVersion}`)
     next()
   }, Math.round(Math.random() * 200))
 }
