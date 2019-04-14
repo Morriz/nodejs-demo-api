@@ -5,6 +5,7 @@ steps:
   - name: build-branch
     image: plugins/docker
     settings:
+      registry: reg.dev.idiotz.nl
       repo: reg.dev.idiotz.nl/api
       username: drone
       password: blabla
@@ -23,6 +24,7 @@ steps:
   - name: build-tags
     image: plugins/docker
     settings:
+      registry: reg.dev.idiotz.nl
       repo: reg.dev.idiotz.nl/api
       username: drone
       password: blabla
