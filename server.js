@@ -1,4 +1,5 @@
 const restify = require('restify')
+
 const env = process.env
 const server = restify.createServer()
 const Prometheus = require('prom-client')
@@ -29,7 +30,7 @@ function handler(req, res, next) {
   const body = req.body
 
   if (!methods.public.includes(method) && !methods.private.includes(method)) {
-    res.send(404, 'Method does not exist: ' + method)
+    res.send(404, `Method does not exist: ${  method}`)
     return next()
   }
   if (methods.private.includes(method) && (key === '' || secret === '')) {
@@ -40,7 +41,7 @@ function handler(req, res, next) {
   // do some api call
   // and send result
   setTimeout(() => {
-    res.send(`method[${method}]: package version: ${packageVersion}`)
+    res.send(`xmethod[${method}]: package version: ${packageVersion}`)
     next()
   }, Math.round(Math.random() * 200))
 }
