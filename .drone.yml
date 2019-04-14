@@ -24,10 +24,11 @@ steps:
         - ${DRONE_BRANCH}-ci
       cache_from:
         - reg.dev.idiotz.nl/api:master
-        - reg.dev.idiotz.nl/api:${DRONE_BRANCH}
+        - reg.dev.idiotz.nl/api:${DRONE_BRANCH}-ci
     when:
       event:
         - push
+        - pull_request
 
   - name: ci-lint
     group: ci
@@ -54,6 +55,9 @@ steps:
         - ${DRONE_BRANCH}-${DRONE_COMMIT}
       cache_from:
         - reg.dev.idiotz.nl/api:${DRONE_BRANCH}-ci
+    when:
+      event:
+        - push
 
   - name: slack
     image: plugins/slack
