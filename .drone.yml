@@ -1,8 +1,47 @@
+# Simple pipeline to accomodate feature branches being merged in master, generating a golden image
+# that is later promoted by tagging accordingly. Example:
+#
+# - staging: reg.dev.idiotz.nl/stg-api:0.1.2
+# - stg: reg.dev.idiotz.nl/api:stg-0.1.2
+# - prod: reg.dev.idiotz.nl/api:0.1.2
+#
+# the pipeline first builds the Dockerfile's ci stage and caches that for parallel test runs
+# afterwards it continues building it into final artifact from the cached ci build.
+
 kind: pipeline
 name: default
 
 steps:
-  - name: build-branch
+  - name: build-ci
+    image: plugins/docker
+      registry: reg.dev.idiotz.nl
+      repo: reg.dev.idiotz.nl/api
+      username: drone
+      password: blabla
+      target: ci
+      tags:
+        - ${DRONE_BRANCH}-ci
+      cache_from:
+        - reg.dev.idiotz.nl/api:master
+        - reg.dev.idiotz.nl/api:${DRONE_BRANCH}
+    when:
+      event:
+        - push
+
+  - name: ci-lint
+    group: ci
+    image: reg.dev.idiotz.nl/api:${DRONE_BRANCH}-ci
+    commands:
+      - npm run lint
+
+  - name: ci-test
+    group: ci
+    image: reg.dev.idiotz.nl/api:${DRONE_BRANCH}-ci
+    commands:
+      - npm test
+
+
+  - name: build-final
     image: plugins/docker
     settings:
       registry: reg.dev.idiotz.nl
@@ -12,30 +51,8 @@ steps:
       tags:
         - ${DRONE_BRANCH}
         - ${DRONE_BRANCH}-${DRONE_COMMIT}
-
       cache_from:
-        - reg.dev.idiotz.nl/api:latest
-        - reg.dev.idiotz.nl/api:${DRONE_BRANCH}
-    when:
-      branch:
-        exclude:
-          - master
-
-  - name: build-tags
-    image: plugins/docker
-    settings:
-      registry: reg.dev.idiotz.nl
-      repo: reg.dev.idiotz.nl/api
-      username: drone
-      password: blabla
-      tags:
-        - ${DRONE_TAG}
-
-      cache_from:
-        - reg.dev.idiotz.nl/api:master
-    when:
-      event:
-        - tag
+        - reg.dev.idiotz.nl/api:${DRONE_BRANCH}-ci
 
   - name: slack
     image: plugins/slack
