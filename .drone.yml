@@ -37,11 +37,8 @@ steps:
       - npm run lint
     depends_on:
       - build-ci
-    settings:
-      registry: reg.dev.idiotz.nl
-      repo: reg.dev.idiotz.nl/api
-      username: drone
-      password: blabla
+    image_pull_secrets:
+      - regcred-api
 
   - name: ci-test
     depends_upon: ci
@@ -50,11 +47,8 @@ steps:
       - npm test
     depends_on:
       - build-ci
-    settings:
-      registry: reg.dev.idiotz.nl
-      repo: reg.dev.idiotz.nl/api
-      username: drone
-      password: blabla
+    image_pull_secrets:
+      - regcred-api
 
   - name: build-final
     image: plugins/docker
