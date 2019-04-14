@@ -31,17 +31,20 @@ steps:
         - pull_request
 
   - name: ci-lint
-    group: ci
+    depends_upon: ci
     image: reg.dev.idiotz.nl/api:${DRONE_BRANCH}-ci
     commands:
       - npm run lint
+    depends_on:
+      - build-ci
 
   - name: ci-test
-    group: ci
+    depends_upon: ci
     image: reg.dev.idiotz.nl/api:${DRONE_BRANCH}-ci
     commands:
       - npm test
-
+    depends_on:
+      - build-ci
 
   - name: build-final
     image: plugins/docker
@@ -55,6 +58,9 @@ steps:
         - ${DRONE_BRANCH}-${DRONE_COMMIT}
       cache_from:
         - reg.dev.idiotz.nl/api:${DRONE_BRANCH}-ci
+    depends_on:
+      - ci-lint
+      - ci-test
     when:
       event:
         - push
