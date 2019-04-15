@@ -81,8 +81,10 @@ steps:
       cache_from:
         - reg.dev.idiotz.nl/api:master
     when:
+      branch:
+        - master
       event:
-        - tags
+        - tag
 
   - name: slack-pr
     image: plugins/slack
