@@ -13,20 +13,17 @@ COPY package*.json ./
 
 RUN npm ci
 
-COPY . .* ./
-
-RUN ls -als
+COPY . .eslintrc.js ./
 
 # ci stage for CI runner
 FROM dev as ci
 
+COPY --from=dev /app/node_modules node_modules
+ARG CI=true
+ENV NODE_ENV=test
 # tests should be executed in parallel (on a good CI runner)
 # by calling this 'ci' stage with different commands (i.e. npm run test:lint)
 
-ARG CI=true
-ENV NODE_ENV=test
-
-# cleanup stage
 FROM ci as clean
 
 RUN npm prune --production
@@ -40,7 +37,7 @@ COPY --from=dev /usr/lib/libgcc* /usr/lib/libstdc* /usr/lib/
 RUN mkdir /app
 WORKDIR /app
 
-COPY --from=ci /app/node_modules node_modules
-COPY --from=ci /app/package.json /app/server.js ./
+COPY --from=clean /app/node_modules node_modules
+COPY --from=clean /app/package.json /app/server.js ./
 
 CMD ["node", "server.js"]
