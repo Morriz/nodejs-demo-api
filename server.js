@@ -1,4 +1,5 @@
 const restify = require('restify')
+
 const env = process.env
 const server = restify.createServer()
 const Prometheus = require('prom-client')
@@ -9,26 +10,26 @@ const httpRequestDurationMicroseconds = new Prometheus.Histogram({
   name: 'http_request_duration_ms',
   help: 'Duration of HTTP requests in ms',
   labelNames: ['method', 'route', 'code'],
-  buckets: [0.1, 5, 15, 50, 100, 200, 300, 400, 500], //  buckets for response time from 0.1ms to 500ms
+  buckets: [0.1, 5, 15, 50, 100, 200, 300, 400, 500] //  buckets for response time from 0.1ms to 500ms
 })
 
 const methods = {
   public: ['publicmethod'],
-  private: ['privatemethod'],
+  private: ['privatemethod']
 }
 
 server.use(restify.plugins.bodyParser())
 server.use(restify.plugins.queryParser())
 
-function handler(req, res, next) {
+function handler (req, res, next) {
+  // bladibla
   const qry = req.query || {}
   const key = qry.key || ''
   const secret = qry.secret || ''
   const method = req.params.method
-  const body = req.body
 
   if (!methods.public.includes(method) && !methods.private.includes(method)) {
-    res.send(404, 'Method does not exist: ' + method)
+    res.send(404, `Method does not exist: ${method}`)
     return next()
   }
   if (methods.private.includes(method) && (key === '' || secret === '')) {
@@ -66,7 +67,7 @@ server.get('/metrics', (req, res) => {
 })
 
 // Error handler
-server.use((err, req, res, next) => {
+server.use((_, req, res, next) => {
   res.send(500, 'Unknown')
   next()
 })
@@ -75,9 +76,7 @@ server.use((err, req, res, next) => {
 server.use((req, res, next) => {
   const responseTimeInMs = Date.now() - res.locals.startEpoch
 
-  httpRequestDurationMicroseconds
-    .labels(req.method, req.route.path, res.statusCode)
-    .observe(responseTimeInMs)
+  httpRequestDurationMicroseconds.labels(req.method, req.route.path, res.statusCode).observe(responseTimeInMs)
 
   next()
 })

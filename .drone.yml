@@ -1,36 +1,116 @@
-# We assume GitHub flow is used, and we simply deploy all feature branches to production.
-# Feature flags are built into the software so we don't deal with it in our CD setup.
-# If an error occurred kubernetes rolls back automatically.
-# The feature is later merged in branch master when the feature behaves ok.
+# Simple pipeline to accomodate feature branches being merged in master, generating a golden image
+# that is later promoted by tagging accordingly. Example:
 #
-# @see https://blogs.technet.microsoft.com/devops/2016/06/21/a-git-workflow-for-continuous-delivery/
-# @see http://blog.launchdarkly.com/is-it-a-feature-flag-or-a-feature-toggle/
+# - staging: reg.dev.idiotz.nl/stg-api:0.1.2
+# - stg: reg.dev.idiotz.nl/api:stg-0.1.2
+# - prod: reg.dev.idiotz.nl/api:0.1.2
+#
+# the pipeline first builds the Dockerfile's ci stage and caches that for parallel test runs
+# afterwards it continues building it into final artifact from the cached ci build.
 
 kind: pipeline
 name: default
 
-steps:
+image_pull_secrets:
+  - regcred-api
 
-  - name: build
+steps:
+  - name: build-ci
     image: plugins/docker
     settings:
+      registry: reg.dev.idiotz.nl
       repo: reg.dev.idiotz.nl/api
+      username: drone
+      password: blabla
+      target: ci
+      tags:
+        - ${DRONE_BRANCH}-ci
+      cache_from:
+        - reg.dev.idiotz.nl/api:master
+        - reg.dev.idiotz.nl/api:${DRONE_BRANCH}-ci
+    when:
+      event:
+        - push
+        - pull_request
+
+  - name: ci-lint
+    image: reg.dev.idiotz.nl/api:${DRONE_BRANCH}-ci
+    pull: always
+    commands:
+      - cd /app
+      - npm run lint
+    depends_on:
+      - build-ci
+
+  - name: ci-test
+    image: reg.dev.idiotz.nl/api:${DRONE_BRANCH}-ci
+    pull: always
+    commands:
+      - cd /app
+      - npm test
+    depends_on:
+      - build-ci
+
+  - name: build-final
+    image: plugins/docker
+    settings:
+      registry: reg.dev.idiotz.nl
+      repo: reg.dev.idiotz.nl/api
+      username: drone
+      password: blabla
       tags:
         - ${DRONE_BRANCH}
         - ${DRONE_BRANCH}-${DRONE_COMMIT}
-        - latest
+      cache_from:
+        - reg.dev.idiotz.nl/api:${DRONE_BRANCH}-ci
+    depends_on:
+      - ci-lint
+      - ci-test
+    when:
+      event:
+        - push
 
+  - name: deploy-tag
+    image: plugins/docker
+    settings:
+      autotag: true
+      registry: reg.dev.idiotz.nl
+      repo: reg.dev.idiotz.nl/api
+      username: drone
+      password: blabla
       cache_from:
         - reg.dev.idiotz.nl/api:master
-        - reg.dev.idiotz.nl/api:${DRONE_BRANCH}
+    when:
+      event:
+        - tags
 
-  - name: slack
+  - name: slack-pr
     image: plugins/slack
     settings:
       webhook: https://hooks.slack.com/services/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
       channel: drone-build
       username: Drone
+    depends_on:
+      - ci-lint
+      - ci-test
     when:
       status:
         - success
         - failure
+      event:
+        - pull_request
+
+  - name: slack-build
+    image: plugins/slack
+    settings:
+      webhook: https://hooks.slack.com/services/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
+      channel: drone-build
+      username: Drone
+    depends_on:
+      - build-final
+    when:
+      status:
+        - success
+        - failure
+      event:
+        - push

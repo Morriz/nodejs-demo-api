@@ -1,4 +1,4 @@
-# dev stage
+# dev stage for developers to override sources
 FROM node:11.14-alpine as dev
 
 RUN apk --no-cache add make gcc g++ python
@@ -12,19 +12,21 @@ WORKDIR /app
 COPY package*.json ./
 
 RUN npm ci
-RUN ls -als
 
-COPY . ./
+COPY . .eslintrc.js ./
 
-# ci stage
+# ci stage for CI runner
 FROM dev as ci
 
+COPY --from=dev /app/node_modules node_modules
 ARG CI=true
 ENV NODE_ENV=test
-
-# this example test is not necessary as tests should be executed in parallel (on a good CI runner)
+# tests should be executed in parallel (on a good CI runner)
 # by calling this 'ci' stage with different commands (i.e. npm run test:lint)
-RUN npm test 
+RUN pwd
+RUN ls -als
+
+FROM ci as clean
 
 RUN npm prune --production
 
@@ -37,7 +39,7 @@ COPY --from=dev /usr/lib/libgcc* /usr/lib/libstdc* /usr/lib/
 RUN mkdir /app
 WORKDIR /app
 
-COPY --from=ci /app/node_modules node_modules
-COPY --from=ci /app/package.json /app/server.js ./
+COPY --from=clean /app/node_modules node_modules
+COPY --from=clean /app/package.json /app/server.js ./
 
 CMD ["node", "server.js"]
