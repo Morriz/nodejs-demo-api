@@ -35,17 +35,12 @@ steps:
     commands:
       - pwd
       - ls -als
-      - ls -als node_modules/.bin
       - npm run lint
-    depends_on:
-      - build-ci
 
   - name: ci-test
     image: reg.dev.idiotz.nl/api:${DRONE_BRANCH}-ci
     commands:
       - npm test
-    depends_on:
-      - build-ci
 
   - name: build-final
     image: plugins/docker
