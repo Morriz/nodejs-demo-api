@@ -23,6 +23,8 @@ ARG CI=true
 ENV NODE_ENV=test
 # tests should be executed in parallel (on a good CI runner)
 # by calling this 'ci' stage with different commands (i.e. npm run test:lint)
+RUN pwd
+RUN ls -als
 
 FROM ci as clean
 
