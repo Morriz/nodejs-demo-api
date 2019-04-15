@@ -15,6 +15,8 @@ RUN npm ci
 
 COPY . .* ./
 
+RUN ls -als
+
 # ci stage for CI runner
 FROM dev as ci
 
