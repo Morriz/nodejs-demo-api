@@ -11,6 +11,9 @@
 kind: pipeline
 name: default
 
+image_pull_secrets:
+  - regcred-api
+
 steps:
   - name: build-ci
     image: plugins/docker
@@ -111,6 +114,3 @@ steps:
         - failure
       event:
         - push
-
-image_pull_secrets:
-  - regcred-api
