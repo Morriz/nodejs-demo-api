@@ -67,6 +67,20 @@ steps:
       event:
         - push
 
+  - name: deploy-tag
+    image: plugins/docker
+    settings:
+      autotag: true
+      registry: reg.dev.idiotz.nl
+      repo: reg.dev.idiotz.nl/api
+      username: drone
+      password: blabla
+      cache_from:
+        - reg.dev.idiotz.nl/api:master
+    when:
+      event:
+        - tags
+
   - name: slack-pr
     image: plugins/slack
     settings:
