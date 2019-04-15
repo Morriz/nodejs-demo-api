@@ -32,15 +32,21 @@ steps:
 
   - name: ci-lint
     image: reg.dev.idiotz.nl/api:${DRONE_BRANCH}-ci
+    pull: always
     commands:
       - pwd
       - ls -als
       - npm run lint
+    depends_on:
+      - build-ci
 
   - name: ci-test
     image: reg.dev.idiotz.nl/api:${DRONE_BRANCH}-ci
+    pull: always
     commands:
       - npm test
+    depends_on:
+      - build-ci
 
   - name: build-final
     image: plugins/docker
