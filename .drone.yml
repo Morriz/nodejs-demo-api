@@ -41,6 +41,10 @@ steps:
       - npm run lint
     depends_on:
       - build-ci
+    when:
+      event:
+        - push
+        - pull_request
 
   - name: ci-test
     image: reg.dev.idiotz.nl/api:${DRONE_BRANCH}-ci
@@ -50,6 +54,10 @@ steps:
       - npm test
     depends_on:
       - build-ci
+    when:
+      event:
+        - push
+        - pull_request
 
   - name: build-final
     image: plugins/docker
