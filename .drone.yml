@@ -1,104 +1,102 @@
-# # Simple pipeline to accomodate feature branches being merged in master, generating a golden image
-# # that is later promoted by tagging accordingly. Example:
-# #
-# # - staging: reg.dev.idiotz.nl/stg-api:0.1.2
-# # - stg: reg.dev.idiotz.nl/api:stg-0.1.2
-# # - prod: reg.dev.idiotz.nl/api:0.1.2
-# #
-# # the pipeline first builds the Dockerfile's ci stage and caches that for parallel test runs
-# # afterwards it continues building it into final artifact from the cached ci build.
+# Simple pipeline to accomodate feature branches being merged in master, generating a golden image
+# that is later promoted by tagging accordingly. Example:
+#
+# - staging: reg.dev.idiotz.nl/stg-api:0.1.2
+# - stg: reg.dev.idiotz.nl/api:stg-0.1.2
+# - prod: reg.dev.idiotz.nl/api:0.1.2
+#
+# the pipeline first builds the Dockerfile's ci stage and caches that for parallel test runs
+# afterwards it continues building it into final artifact from the cached ci build.
 
 kind: pipeline
 name: default
 
 steps:
-  # - name: build-ci
-  #   image: plugins/docker
-  #   settings:
-  #     registry: reg.dev.idiotz.nl
-  #     repo: reg.dev.idiotz.nl/api
-  #     username: drone
-  #     password: blabla
-  #     target: ci
-  #     tags:
-  #       - ${DRONE_BRANCH}-ci
-  #     cache_from:
-  #       - reg.dev.idiotz.nl/api:master
-  #       - reg.dev.idiotz.nl/api:${DRONE_BRANCH}-ci
-  #   when:
-  #     event:
-  #       - push
-  #       - pull_request
+  - name: build-ci
+    image: plugins/docker
+    settings:
+      registry: reg.dev.idiotz.nl
+      repo: reg.dev.idiotz.nl/api
+      username: drone
+      password: blabla
+      target: ci
+      tags:
+        - ${DRONE_BRANCH}-ci
+      cache_from:
+        - reg.dev.idiotz.nl/api:master
+        - reg.dev.idiotz.nl/api:${DRONE_BRANCH}-ci
+    when:
+      event:
+        - push
+        - pull_request
 
   - name: ci-lint
     image: reg.dev.idiotz.nl/api:${DRONE_BRANCH}-ci
     pull: always
     commands:
-      - pwd
-      - ls -als
-      - ls -als /
-      - ls -als /app
+      - cd /app
       - npm run lint
-    # depends_on:
-    #   - build-ci
+    depends_on:
+      - build-ci
 
-  # - name: ci-test
-  #   image: reg.dev.idiotz.nl/api:${DRONE_BRANCH}-ci
-  #   pull: always
-  #   commands:
-  #     - npm test
-  #   depends_on:
-  #     - build-ci
+  - name: ci-test
+    image: reg.dev.idiotz.nl/api:${DRONE_BRANCH}-ci
+    pull: always
+    commands:
+      - cd /app
+      - npm test
+    depends_on:
+      - build-ci
 
-  # - name: build-final
-  #   image: plugins/docker
-  #   settings:
-  #     registry: reg.dev.idiotz.nl
-  #     repo: reg.dev.idiotz.nl/api
-  #     username: drone
-  #     password: blabla
-  #     tags:
-  #       - ${DRONE_BRANCH}
-  #       - ${DRONE_BRANCH}-${DRONE_COMMIT}
-  #     cache_from:
-  #       - reg.dev.idiotz.nl/api:${DRONE_BRANCH}-ci
-  #   depends_on:
-  #     - ci-lint
-  #     - ci-test
-  #   when:
-  #     event:
-  #       - push
+  - name: build-final
+    image: plugins/docker
+    settings:
+      registry: reg.dev.idiotz.nl
+      repo: reg.dev.idiotz.nl/api
+      username: drone
+      password: blabla
+      tags:
+        - ${DRONE_BRANCH}
+        - ${DRONE_BRANCH}-${DRONE_COMMIT}
+      cache_from:
+        - reg.dev.idiotz.nl/api:${DRONE_BRANCH}-ci
+    depends_on:
+      - ci-lint
+      - ci-test
+    when:
+      event:
+        - push
 
-  # - name: slack-pr
-  #   image: plugins/slack
-  #   settings:
-  #     webhook: https://hooks.slack.com/services/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
-  #     channel: drone-build
-  #     username: Drone
-  #   depends_on:
-  #     - ci-lint
-  #     - ci-test
-  #   when:
-  #     status:
-  #       - success
-  #       - failure
-  #     event:
-  #       - pull_request
+  - name: slack-pr
+    image: plugins/slack
+    settings:
+      webhook: https://hooks.slack.com/services/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
+      channel: drone-build
+      username: Drone
+    depends_on:
+      - ci-lint
+      - ci-test
+    when:
+      status:
+        - success
+        - failure
+      event:
+        - pull_request
 
-  # - name: slack-build
-  #   image: plugins/slack
-  #   settings:
-  #     webhook: https://hooks.slack.com/services/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
-  #     channel: drone-build
-  #     username: Drone
-  #   depends_on:
-  #     - build-final
-  #   when:
-  #     status:
-  #       - success
-  #       - failure
-  #     event:
-  #       - push
+  - name: slack-build
+    image: plugins/slack
+    settings:
+      webhook: https://hooks.slack.com/services/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
+      channel: drone-build
+      username: Drone
+    depends_on:
+      - build-final
+    when:
+      status:
+        - success
+        - failure
+      event:
+        - push
 
 image_pull_secrets:
   - regcred-api
